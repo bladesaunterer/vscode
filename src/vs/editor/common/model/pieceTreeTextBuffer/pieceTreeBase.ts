@@ -269,18 +269,18 @@ export class PieceTreeBase {
 	protected _buffers!: StringBuffer[]; // 0 is change buffer, others are readonly original buffer.
 	protected _lineCnt!: number;
 	protected _length!: number;
-	protected _EOL!: '\r\n' | '\n';
+	protected _EOL!: '\r\n' | '\n' | '\r';
 	protected _EOLLength!: number;
 	protected _EOLNormalized!: boolean;
 	private _lastChangeBufferPos!: BufferCursor;
 	private _searchCache!: PieceTreeSearchCache;
 	private _lastVisitedLine!: { lineNumber: number; value: string; };
 
-	constructor(chunks: StringBuffer[], eol: '\r\n' | '\n', eolNormalized: boolean) {
+	constructor(chunks: StringBuffer[], eol: '\r\n' | '\n' | '\r', eolNormalized: boolean) {
 		this.create(chunks, eol, eolNormalized);
 	}
 
-	create(chunks: StringBuffer[], eol: '\r\n' | '\n', eolNormalized: boolean) {
+	create(chunks: StringBuffer[], eol: '\r\n' | '\n' | '\r', eolNormalized: boolean) {
 		this._buffers = [
 			new StringBuffer('', [0])
 		];
@@ -316,7 +316,7 @@ export class PieceTreeBase {
 		this.computeBufferMetadata();
 	}
 
-	normalizeEOL(eol: '\r\n' | '\n') {
+	normalizeEOL(eol: '\r\n' | '\n' | '\r') {
 		let averageBufferSize = AverageBufferSize;
 		let min = averageBufferSize - Math.floor(averageBufferSize / 3);
 		let max = min * 2;
@@ -351,11 +351,11 @@ export class PieceTreeBase {
 	}
 
 	// #region Buffer API
-	public getEOL(): '\r\n' | '\n' {
+	public getEOL(): '\r\n' | '\n' | '\r' {
 		return this._EOL;
 	}
 
-	public setEOL(newEOL: '\r\n' | '\n'): void {
+	public setEOL(newEOL: '\r\n' | '\n' | '\r'): void {
 		this._EOL = newEOL;
 		this._EOLLength = this._EOL.length;
 		this.normalizeEOL(newEOL);

@@ -24,17 +24,27 @@ export class PieceTreeTextBufferFactory implements ITextBufferFactory {
 		private readonly _normalizeEOL: boolean
 	) { }
 
-	private _getEOL(defaultEOL: DefaultEndOfLine): '\r\n' | '\n' {
+	private _getEOL(defaultEOL: DefaultEndOfLine): '\r\n' | '\n' | '\r' {
 		const totalEOLCount = this._cr + this._lf + this._crlf;
-		const totalCRCount = this._cr + this._crlf;
+		// const totalCRCount = this._cr + this._crlf;
+
+		console.log(this._cr);
+
 		if (totalEOLCount === 0) {
 			// This is an empty file or a file with precisely one line
 			return (defaultEOL === DefaultEndOfLine.LF ? '\n' : '\r\n');
 		}
-		if (totalCRCount > totalEOLCount / 2) {
+
+		if (this._cr > totalEOLCount / 2) {
+			// More than half of the file contains \r ending lines
+			return '\r';
+		}
+
+		if (this._crlf > totalEOLCount / 2) {
 			// More than half of the file contains \r\n ending lines
 			return '\r\n';
 		}
+
 		// At least one line more ends in \n
 		return '\n';
 	}
@@ -45,7 +55,8 @@ export class PieceTreeTextBufferFactory implements ITextBufferFactory {
 
 		if (this._normalizeEOL &&
 			((eol === '\r\n' && (this._cr > 0 || this._lf > 0))
-				|| (eol === '\n' && (this._cr > 0 || this._crlf > 0)))
+				|| (eol === '\n' && (this._cr > 0 || this._crlf > 0))
+				|| (eol === '\r' && (this._crlf > 0 || this._lf > 0)))
 		) {
 			// Normalize pieces
 			for (let i = 0, len = chunks.length; i < len; i++) {

@@ -296,7 +296,11 @@ export const enum EndOfLineSequence {
 	/**
 	 * Use carriage return and line feed (\r\n) as the end of line character.
 	 */
-	CRLF = 1
+	CRLF = 1,
+	/**
+	 * Use carriage return and line feed (\r\n) as the end of line character.
+	 */
+	CR = 2
 }
 
 /**
@@ -1362,7 +1366,7 @@ export interface IReadonlyTextBuffer {
  * @internal
  */
 export interface ITextBuffer extends IReadonlyTextBuffer {
-	setEOL(newEOL: '\r\n' | '\n'): void;
+	setEOL(newEOL: '\r\n' | '\n' | '\r'): void;
 	applyEdits(rawOperations: ValidAnnotatedEditOperation[], recordTrimAutoWhitespace: boolean, computeUndoEdits: boolean): ApplyEditsResult;
 }
 

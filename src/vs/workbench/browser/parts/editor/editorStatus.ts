@@ -291,6 +291,7 @@ const nlsMultiSelectionRange = localize('multiSelectionRange', "{0} selections (
 const nlsMultiSelection = localize('multiSelection', "{0} selections");
 const nlsEOLLF = localize('endOfLineLineFeed', "LF");
 const nlsEOLCRLF = localize('endOfLineCarriageReturnLineFeed', "CRLF");
+const nlsEOLCR = localize('endOfLineCarriageReturn', "CR");
 
 export class EditorStatus extends Disposable implements IWorkbenchContribution {
 
@@ -1290,11 +1291,24 @@ export class ChangeEOLAction extends Action {
 		const EOLOptions: IChangeEOLEntry[] = [
 			{ label: nlsEOLLF, eol: EndOfLineSequence.LF },
 			{ label: nlsEOLCRLF, eol: EndOfLineSequence.CRLF },
+			{ label: nlsEOLCR, eol: EndOfLineSequence.CR },
 		];
 
-		const selectedIndex = (textModel?.getEOL() === '\n') ? 0 : 1;
+		const selectedIndex = (() => {
+			const eolFromModel = textModel?.getEOL();
+
+			if (eolFromModel === '\n') {
+				return 0;
+			} else if (eolFromModel === '\r\n') {
+				return 1;
+			} else {
+				return 2;
+			}
+		})();
 
 		const eol = await this.quickInputService.pick(EOLOptions, { placeHolder: localize('pickEndOfLine', "Select End of Line Sequence"), activeItem: EOLOptions[selectedIndex] });
+
+		console.log(JSON.stringify(eol));
 		if (eol) {
 			const activeCodeEditor = getCodeEditor(this.editorService.activeTextEditorControl);
 			if (activeCodeEditor?.hasModel() && !this.editorService.activeEditor?.hasCapability(EditorInputCapabilities.Readonly)) {
